@@ -1,0 +1,23 @@
+app:
+  title: "KINOSTICK"
+  version: 0.0.1
+
+server:
+  port: 8079
+  hostname: '7'
+
+streams:
+  ports:
+    begin: 49140
+    end: 49143
+
+tmp:
+  dir: /tmp/torrent-stream/
+
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+springdoc:
+  swagger-ui:
+    path: /kinostick/swagger-ui.html
