@@ -1,6 +1,5 @@
 package kinostick.web.controllers;
 
-
 import kinostick.api.controllers.ApiController;
 import kinostick.api.model.device.DeviceEnum;
 import kinostick.api.model.stream.close.CloseStreamRq;
@@ -9,11 +8,7 @@ import kinostick.stream.exeption.InvalidTorrentException;
 import kinostick.stream.exeption.NoFreePortsException;
 import kinostick.stream.model.Memory;
 import kinostick.stream.model.Movie;
-import kinostick.stream.model.Proxy;
-import kinostick.stream.service.ExecService;
-import kinostick.stream.service.NetworkService;
 import kinostick.stream.service.StreamService;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +22,6 @@ import org.springframework.web.context.annotation.RequestScope;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -36,11 +30,6 @@ import java.util.stream.Collectors;
 @RequestScope
 public class StreamController extends ApiController {
 
-
-
-
-    @Autowired
-    private ExecService execService;
     @Autowired
     private Memory memory;
     @Autowired
@@ -53,21 +42,12 @@ public class StreamController extends ApiController {
         return map.keySet().stream()
                 .map(key -> key + "=" + map.get(key).toString())
                 .collect(Collectors.joining(", ", "{", "}"));
-//        return streamService.getProcesses();
     }
 
 
-    @GetMapping("/pool/free")
-    public Integer countFreeChannels() {
-        return streamService.getPoolSize()-streamService.getProcesses().size();
-    }
-    @GetMapping("/pool/size")
-    public Integer getPoolSize() {
-        return streamService.getPoolSize();
-    }
 
     @RequestMapping(value = "/{device}/{id}", method = RequestMethod.GET)
-    public void redirectIOS(@PathVariable("device") String device, @PathVariable("id") String id, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public void redirect(@PathVariable("device") String device, @PathVariable("id") String id, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
 
         log.info(device);
         log.info(id);
@@ -87,22 +67,6 @@ public class StreamController extends ApiController {
         httpServletResponse.setStatus(302);
     }
 
-//    @RequestMapping(value = "/android/{id}", method = RequestMethod.GET)
-//    public void redirectANDROID(@PathVariable("id") String id, HttpServletResponse httpServletResponse) {
-//
-//        if (memory.getUrlById(id) == null) {
-//            httpServletResponse.setStatus(404);
-//            return;
-//        }
-//
-//        httpServletResponse.setHeader("Location", "vlc://"+memory.getUrlById(id));
-//        httpServletResponse.setStatus(302);
-//    }
-
-    @PostMapping("/close")
-    public String close(@RequestBody CloseStreamRq rq) {
-        return streamService.closeConnection(rq.getUuid());
-    }
 
     @PostMapping("/stream")
     public String stream(@RequestBody OpenStreamRq rq) {
@@ -124,5 +88,12 @@ public class StreamController extends ApiController {
             return e.getMsg();
         }
     }
+
+
+    @PostMapping("/close")
+    public String close(@RequestBody CloseStreamRq rq) {
+        return streamService.closeConnection(rq.getUuid());
+    }
+
 
 }

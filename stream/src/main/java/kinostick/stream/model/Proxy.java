@@ -2,7 +2,12 @@ package kinostick.stream.model;
 
 import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
 @Component
@@ -13,9 +18,6 @@ public class Proxy {
     private String NGINX_PROXY_TEMPLATE = "location %s {\n" +
             "  proxy_pass http://127.0.0.1:%d;\n" +
             "}";
-
-    private Integer port;
-
 
     public void createProxy(String name,Integer port, String url) {
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(String.format(PROXY_PATH, name)), StandardCharsets.UTF_8))) {
@@ -33,7 +35,6 @@ public class Proxy {
     private String fillTemplate(String template, String url, Integer port) {
         return String.format(template, url, port);
     }
-
 
 
 }
