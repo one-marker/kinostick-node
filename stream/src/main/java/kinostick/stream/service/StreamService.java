@@ -12,10 +12,8 @@ import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -62,8 +60,8 @@ public class StreamService {
             throw new NoFreePortsException();
         }
 
-        String[] cmd = {"kinostix", "-p", String.valueOf(port), magnet, "--path", allocateDir(uuid)};
-        //, "--remove"
+        String[] cmd = {"kinostix", "-p", String.valueOf(port), magnet, "--path", allocateDir(uuid), "--remove"};
+
         Process process;
         try {
             process = new ProcessBuilder(cmd)
