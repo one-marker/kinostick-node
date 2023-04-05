@@ -1,8 +1,13 @@
 package kinostick.stream.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.SocketUtils;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class NetworkService {
@@ -13,43 +18,40 @@ public class NetworkService {
     private Integer port;
 
 
+    private final Set<String> whiteList = new HashSet<>();
+    @Autowired
+    private ExecService execService;
 
-    public String getHostname()  {
+    public String getHostname() {
         return hostname;
-        /*
-        Enumeration<NetworkInterface> n = null;
+    }
+
+    public String accessClient(String ip, Integer port) {
+        if (whiteList.contains(ip)) {
+            return "ip already in the list";
+        }
         try {
-            n = NetworkInterface.getNetworkInterfaces();
-        } catch (SocketException e) {
+
+            execService.execute("iptables -I INPUT -p tcp -s " + ip + " --dport " + port + " -j ACCEPT");
+            whiteList.add(ip);
+            return String.format("access to %d granted for %s:", port, ip);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        for (; n.hasMoreElements();)
-        {
-            NetworkInterface e = n.nextElement();
+    }
 
-            Enumeration<InetAddress> a = e.getInetAddresses();
-            for (; a.hasMoreElements();)
-            {
-                InetAddress addr = a.nextElement();
-                //System.out.println("  " + addr.getHostAddress());
-                String ip = addr.getHostAddress();
-                if (ip.substring(0,3).equals("192")) {
-                    return ip;
-                }
-            }
+    public String restart() {
+
+        try {
+            execService.execute("service nginx reload");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
 
-        return "127.0.0.1";
-*/
+        return "OK";
     }
-
-//    public Integer getAvailableTcpPort() {
-//        return SocketUtils.findAvailableTcpPort();
-//    }
-
-    public Integer getPort() {
-        return port;
-    }
-
-
 }

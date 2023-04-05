@@ -3,8 +3,10 @@ app:
   version: 0.0.1
 
 server:
-  port: 8079
-  hostname: '7'
+  port: 8097
+  hostname: '77.220.143.61'
+  servlet:
+    context-path: "/web"
 
 streams:
   ports:

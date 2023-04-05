@@ -9,6 +9,7 @@ import kinostick.stream.exeption.InvalidTorrentException;
 import kinostick.stream.exeption.NoFreePortsException;
 import kinostick.stream.model.Memory;
 import kinostick.stream.model.Movie;
+import kinostick.stream.model.Proxy;
 import kinostick.stream.service.ExecService;
 import kinostick.stream.service.NetworkService;
 import kinostick.stream.service.StreamService;
@@ -26,6 +27,7 @@ import org.springframework.web.context.annotation.RequestScope;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -33,6 +35,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestScope
 public class StreamController extends ApiController {
+
 
 
 
