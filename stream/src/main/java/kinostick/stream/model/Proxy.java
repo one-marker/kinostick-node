@@ -16,7 +16,12 @@ public class Proxy {
     private String PROXY_PATH = "/etc/nginx/conf.d/include/proxy-%s.conf";
 
     private String NGINX_PROXY_TEMPLATE = "location %s {\n" +
-            "  proxy_pass http://127.0.0.1:%d;\n" +
+            "proxy_set_header Host $host;\n" +
+            "proxy_set_header X-Forwarded-Scheme $scheme;\n" +
+            "proxy_set_header X-Forwarded-Proto  $scheme;\n" +
+            "proxy_set_header X-Forwarded-For    $remote_addr;\n" +
+            "proxy_set_header X-Real-IP          $remote_addr;" +
+            "proxy_pass http://127.0.0.1:%d;\n" +
             "}";
 
     public void createProxy(String name,Integer port, String url) {

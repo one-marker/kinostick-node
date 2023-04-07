@@ -10,8 +10,8 @@ server:
 
 streams:
   ports:
-    begin: 49140
-    end: 49143
+    begin: 60000
+    end: 65535
 
 tmp:
   dir: /tmp/torrent-stream/
