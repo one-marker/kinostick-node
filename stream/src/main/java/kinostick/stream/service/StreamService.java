@@ -5,6 +5,7 @@ import kinostick.stream.exeption.NoFreePortsException;
 import kinostick.stream.model.Memory;
 import kinostick.stream.model.Movie;
 import kinostick.stream.model.Pool;
+import kinostick.stream.model.Proxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,8 @@ public class StreamService {
 
     @Value("${tmp.dir}")
     private String tmpDir;
-
+    @Autowired
+    private Proxy proxy;
     @Autowired
     private Pool pool;
     @Autowired
@@ -60,7 +62,7 @@ public class StreamService {
             throw new NoFreePortsException();
         }
 
-        String[] cmd = {"kinostix", "-p", String.valueOf(port), magnet, "--path", allocateDir(uuid), "--remove"};
+        String[] cmd = {"kinostix", "-p", String.valueOf(port), magnet, "--url", "/"+uuid+"/", "--path", allocateDir(uuid), "--remove"};
 
         Process process;
         try {
@@ -84,6 +86,9 @@ public class StreamService {
             throw new RuntimeException(e);
         }
 
+
+        proxy.createProxy(uuid, port, "/"+uuid+"/");
+        networkService.restart();
         return new Movie(uuid, networkService.getHostname(), port, generateMovieLink(networkService.getHostname(), port), magnet, process);
     }
 
@@ -96,6 +101,8 @@ public class StreamService {
             pool.freePort(port);
             memory.removeMovieById(uuid);
             removeTmp(uuid);
+            proxy.removeProxy(uuid);
+            networkService.restart();
         }
 
         return "Соединение закрыто";
