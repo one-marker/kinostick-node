@@ -5,7 +5,6 @@ import kinostick.stream.exeption.NoFreePortsException;
 import kinostick.stream.model.Memory;
 import kinostick.stream.model.Movie;
 import kinostick.stream.model.Pool;
-import kinostick.stream.model.Proxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,7 @@ public class StreamService {
     @Value("${tmp.dir}")
     private String tmpDir;
     @Autowired
-    private Proxy proxy;
+    private ProxyManagerService proxyManagerService;
     @Autowired
     private Pool pool;
     @Autowired
@@ -39,7 +38,7 @@ public class StreamService {
             return movie;
         }
 
-        return memory.putMovie(startPeerFlix(UUID.randomUUID().toString(), magnet));
+        return memory.putMovie(startStreaming(UUID.randomUUID().toString(), magnet));
     }
 
     public Integer getPoolSize() {
@@ -48,21 +47,16 @@ public class StreamService {
 
     public Map<String, Movie> getProcesses() {
         return memory.getIdMovieMap();
-//        Map<String, Movie> map = memory.getIdMovieMap();
-//        return map.keySet().stream()
-//                .map(key -> key + "=" + map.get(key).toString())
-//                .collect(Collectors.joining(", ", "{", "}"));
     }
 
-    private Movie startPeerFlix(String uuid, String magnet) {
-//        String ip = networkService.getIp();
+    private Movie startStreaming(String uuid, String magnet) {
         int port = pool.reservePort();
 
         if (port == -1) {
             throw new NoFreePortsException();
         }
 
-        String[] cmd = {"kinostix", "-p", String.valueOf(port), magnet, "--url", "/"+uuid+"/", "--path", allocateDir(uuid), "--remove"};
+        String[] cmd = {"kinostix", "-p", String.valueOf(port), magnet, "--url", contextPathHLS(uuid), "--path", allocateDir(uuid), "--remove"};
 
         Process process;
         try {
@@ -87,9 +81,10 @@ public class StreamService {
         }
 
 
-        proxy.createProxy(uuid, port, "/"+uuid+"/");
-        networkService.restart();
-        return new Movie(uuid, networkService.getHostname(), port, generateMovieLink(networkService.getHostname(), port), magnet, process);
+        proxyManagerService.createProxy(uuid, port, contextPathHLS(uuid));
+        networkService.nginxReload();
+
+        return new Movie(uuid, networkService.getHostname(), port, getFullPathHLS(contextPathHLS(uuid)), magnet, process);
     }
 
     public String closeConnection(String uuid) {
@@ -101,8 +96,8 @@ public class StreamService {
             pool.freePort(port);
             memory.removeMovieById(uuid);
             removeTmp(uuid);
-            proxy.removeProxy(uuid);
-            networkService.restart();
+            proxyManagerService.removeProxy(uuid);
+            networkService.nginxReload();
         }
 
         return "Соединение закрыто";
@@ -118,8 +113,11 @@ public class StreamService {
         return tmpDir + uuid.trim().strip();
     }
 
-    private String generateMovieLink(String host, int port) {
-        return String.format("http://%s:%d/", host, port);
+    private String getFullPathHLS(String url) {
+        return String.format("http://%s:%d%s", networkService.getHostname(), networkService.getPort(), url);
     }
 
+    private String contextPathHLS(String uuid) {
+        return String.format("/hls/%s/", uuid);
+    }
 }

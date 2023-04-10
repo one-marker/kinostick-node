@@ -46,7 +46,7 @@ public class Memory {
         return idMovieMap;
     }
 
-    public Map<String, Movie> getMagnetMovieMap() {
+    public Map<String, Movie> getMagnetMovixeMap() {
         return magnetMovieMap;
     }
 }

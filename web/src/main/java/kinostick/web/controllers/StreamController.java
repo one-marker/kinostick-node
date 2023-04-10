@@ -44,8 +44,6 @@ public class StreamController extends ApiController {
                 .collect(Collectors.joining(", ", "{", "}"));
     }
 
-
-
     @RequestMapping(value = "/{device}/{id}", method = RequestMethod.GET)
     public void redirect(@PathVariable("device") String device, @PathVariable("id") String id, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
 

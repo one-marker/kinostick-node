@@ -3,15 +3,15 @@ app:
   version: 0.0.1
 
 server:
-  port: 8097
+  port: 4000
   hostname: '77.220.143.61'
   servlet:
-    context-path: "/web"
+    context-path: "/api"
 
 streams:
   ports:
     begin: 60000
-    end: 65535
+    end: 60051
 
 tmp:
   dir: /tmp/torrent-stream/

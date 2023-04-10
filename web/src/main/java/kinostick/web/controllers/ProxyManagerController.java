@@ -1,6 +1,6 @@
 package kinostick.web.controllers;
 
-import kinostick.stream.model.Proxy;
+import kinostick.stream.service.ProxyManagerService;
 import kinostick.stream.service.NetworkService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,27 +16,27 @@ public class ProxyManagerController {
 
 
     @Autowired
-    private Proxy proxy;
+    private ProxyManagerService proxyManagerService;
     @Autowired
     private NetworkService networkService;
 
     @GetMapping("/reload")
     public String reload() {
-        networkService.restart();
+        networkService.nginxReload();
         return "OK";
     }
 
     @GetMapping("/proxy/{name}/{port}/{path}")
     public String proxy(@PathVariable String name, @PathVariable String port, @PathVariable String path) {
-        proxy.createProxy(name, Integer.valueOf(port), path.replace('_','/'));
-        networkService.restart();
+        proxyManagerService.createProxy(name, Integer.valueOf(port), path.replace('_','/'));
+        networkService.nginxReload();
         return "OK";
     }
 
     @GetMapping("/close/{name}")
     public String close(@PathVariable String name) {
-        proxy.removeProxy(name);
-        networkService.restart();
+        proxyManagerService.removeProxy(name);
+        networkService.nginxReload();
         return "OK";
     }
 }

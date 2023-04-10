@@ -25,6 +25,10 @@ public class NetworkService {
         return hostname;
     }
 
+    public Integer getPort() {
+        return port;
+    }
+
     public String accessClient(String ip, Integer port) {
         if (whiteList.contains(ip)) {
             return "ip already in the list";
@@ -41,7 +45,7 @@ public class NetworkService {
         }
     }
 
-    public String restart() {
+    public String nginxReload() {
 
         try {
             execService.execute("service nginx reload");

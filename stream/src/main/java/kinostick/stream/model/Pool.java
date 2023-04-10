@@ -42,30 +42,13 @@ public class Pool {
             return -1;
         }
         Integer port = freePorts.pop();
-//        reservedPorts.add(port);upnpRule(UPnp.ADD, String.valueOf(port));
+        reservedPorts.add(port);
         return port;
     }
 
     public Integer freePort(Integer port) {
         reservedPorts.remove(port);
         freePorts.push(port);
-//        upnpRule(UPnp.DELETE, String.valueOf(port));
         return port;
     }
-
-    /*
-
-    //todo открыть порт на хосте по протоколу upnp
-    private void upnpRule(UPnp rule, String port) {
-        String cmd = String.format("java -jar /Users/marker/Downloads/portmapper-2.2.1.jar -lib org.chris.portmapper.router.weupnp.WeUPnPRouterFactory  -%s -externalPort %s -internalPort %s -protocol tcp -description KINOSTICK", rule.getOperation(), port, port);
-        try {
-            execService.execute(cmd);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-     */
 }

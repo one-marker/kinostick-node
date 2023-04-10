@@ -1,0 +1,6 @@
+  set $forward_scheme http;
+  set $server         "127.0.0.1";
+  set $port           81;
+listen 81;
+listen [::]:81;
+server_name ${NGINX_APP_HOSTNAME};
