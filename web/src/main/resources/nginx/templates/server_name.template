@@ -3,4 +3,4 @@
   set $port           81;
 listen 81;
 listen [::]:81;
-server_name ${NGINX_APP_HOSTNAME};
+server_name ${APP_HOSTNAME};

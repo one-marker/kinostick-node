@@ -4,7 +4,7 @@ app:
 
 server:
   port: 4000
-  hostname: '77.220.143.61'
+  hostname: ${APP_HOSTNAME}
   servlet:
     context-path: "/api"
 
