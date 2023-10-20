@@ -2,10 +2,7 @@ package kinostick.stream.service;
 
 import kinostick.stream.exeption.InvalidTorrentException;
 import kinostick.stream.exeption.NoFreePortsException;
-import kinostick.stream.model.Memory;
-import kinostick.stream.model.Movie;
-import kinostick.stream.model.Pool;
-import kinostick.stream.model.TorrentFile;
+import kinostick.stream.model.*;
 import kinostick.stream.model.format.VideoType;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.EnumUtils;
@@ -26,6 +23,9 @@ import java.util.UUID;
 
 @Service
 public class StreamService {
+
+    @Autowired
+    private InfoScanner infoScanner;
 
     @Value("${tmp.dir}")
     private String tmpDir;
@@ -62,58 +62,7 @@ public class StreamService {
     }
 
     public List<TorrentFile> getFileList(String magnet) {
-
-        List<TorrentFile> torrentFileList = new ArrayList<>();
-        String[] cmd = {"kinostix", magnet, "--list"};
-
-        try {
-            Process process = new ProcessBuilder(cmd)
-                    .start();
-
-
-            // Start a new java process
-
-
-            // Read and print the standard output stream of the process
-            try (BufferedReader input =
-                         new BufferedReader(new
-                                 InputStreamReader(process.getInputStream()))) {
-                String line;
-                while ((line = input.readLine()) != null) {
-
-                    System.out.println(line);
-
-                    if (line.contains(".")) {
-
-                        line = line.replace("\u001B", "");
-                        line = line.replaceAll("[\\[0-9]+?[Bmh]", "");
-                        line = line.replace(" ", "");
-
-                        String[] split = line.split(":");
-
-                        String filename = new File(split[1]).getName();
-                        String extension = FilenameUtils.getExtension(filename).toUpperCase();
-
-                        if (!EnumUtils.isValidEnum(VideoType.class, extension)) {
-                            continue;
-                        }
-
-                        System.out.println(split[0]);
-                        torrentFileList.add(new TorrentFile(split[0],
-                                FilenameUtils.removeExtension(new File(split[1]).getName()),
-                                VideoType.valueOf(extension),
-                                split[2].strip()));
-                    }
-                }
-                int status = process.waitFor();
-                System.out.println("Exited with status: " + status);
-                process.destroy();
-            }
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        return torrentFileList;
+        return infoScanner.scan(magnet);
     }
 
     private Movie startStreaming(String uuid, String magnet) {
