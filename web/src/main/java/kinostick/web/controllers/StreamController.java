@@ -48,23 +48,24 @@ public class StreamController extends ApiController {
                 .collect(Collectors.joining(", ", "{", "}"));
     }
 
-    @RequestMapping(value = "/{device}/{id}", method = RequestMethod.GET)
-    public void redirect(@PathVariable("device") String device, @PathVariable("id") String id, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    @RequestMapping(value = "/{device}/{uuid}/{id}", method = RequestMethod.GET)
+    public void redirect(@PathVariable("device") String device, @PathVariable("uuid") String uuid, @PathVariable("id") String id, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
 
         log.info(device);
+        log.info(uuid);
         log.info(id);
         log.info(httpServletRequest.getScheme() + "://"+ httpServletRequest.getLocalAddr());
 
-        if (memory.getUrlById(id) == null) {
+        if (memory.getUrlById(uuid) == null) {
             httpServletResponse.setStatus(404);
             return;
         }
         switch (device) {
             case "android":
-                httpServletResponse.setHeader("Location", "vlc://"+memory.getUrlById(id));
+                httpServletResponse.setHeader("Location", "vlc://"+memory.getUrlById(uuid)+id);
                 break;
             case "ios":
-                httpServletResponse.setHeader("Location", "vlc-x-callback://x-callback-url/ACTION?url="+memory.getUrlById(id));
+                httpServletResponse.setHeader("Location", "vlc-x-callback://x-callback-url/ACTION?url="+memory.getUrlById(uuid)+id);
         }
         httpServletResponse.setStatus(302);
     }

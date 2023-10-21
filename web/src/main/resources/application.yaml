@@ -5,6 +5,7 @@ app:
 server:
   port: 4000
   hostname: ${APP_HOSTNAME}
+  info_timeout: ${INFO_TIMEOUT:3}
   servlet:
     context-path: "/api"
 
